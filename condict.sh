@@ -11,6 +11,7 @@ json_queries=(
     '.[0].meanings[0].partOfSpeech'
     '.[0].phonetic'
     )
+json_queries_option=0
 
 # Display help menu
 Help(){
@@ -35,26 +36,32 @@ usage(){
 }
 
 # Display definition of given word
-get_definition(){
-  curl --silent https://api.dictionaryapi.dev/api/v2/entries/en/$given_word | jq -r ${json_queries[0]}
+get_api(){
+  curl --silent https://api.dictionaryapi.dev/api/v2/entries/en/$given_word | jq -r ${json_queries[$json_queries_option]}
 }
 
-# Return last argument which is word
+
+# Get last argument which is word
 for i in $@; do :; done
 given_word=$i
-# and display definition
-get_definition
 
-# TODO
+# and display definition
+echo "Definition:"
+get_api
+echo
+
+# Argument handler
 while getopts ':pPsh:' flag; do
   case "${flag}" in
 
     p)
-
+      json_queries_option=1
+      echo "Part of speech: $(get_api)"
       ;;
 
     P)
-
+      json_queries_option=2
+      echo "Phonetic: $(get_api)"
       ;;  
 
     s) 
@@ -64,8 +71,12 @@ while getopts ':pPsh:' flag; do
     h) 
       echo
       Help
-      exit
-      ;;
+      exit;;
+
+    \?)
+      echo
+      Help
+      exit;;
 
     *) 
       echo "Invalid option: use -h"
@@ -74,4 +85,3 @@ while getopts ':pPsh:' flag; do
       exit;;
   esac
 done
-
