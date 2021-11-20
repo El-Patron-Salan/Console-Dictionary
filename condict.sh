@@ -42,6 +42,15 @@ get_api(){
   curl --silent https://api.dictionaryapi.dev/api/v2/entries/en/$given_word | jq -r ${json_queries[$json_queries_option]}
 }
 
+# catch_error(){
+#   local title_contain="No Definitions Found"
+#   check=$(curl --silent https://api.dictionaryapi.dev/api/v2/entries/en/$given_word | jq - '.title')
+#   if [[ "$check" = "$title_contain" ]]; then
+#     echo "$title_contain for '$given_word'"
+#     exit 1;
+#   fi
+# }
+
 # Get last argument
 for i in "$@"; do true; done
 given_word=$i
