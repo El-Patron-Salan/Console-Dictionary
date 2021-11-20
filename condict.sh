@@ -51,6 +51,13 @@ get_api(){
 #   fi
 # }
 
+# Check if there is any argument
+NUMBER_OF_ARGUMENTS=$#
+if [ $NUMBER_OF_ARGUMENTS -eq 0 ]; then
+  Help
+  exit 1;
+fi
+
 # Get last argument
 for i in "$@"; do true; done
 given_word=$i
