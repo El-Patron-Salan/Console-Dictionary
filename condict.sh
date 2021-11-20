@@ -1,13 +1,15 @@
 #!/usr/bin/env bash
 
-# Handle errors
+# Handle error
 set -e
 set -u
 
 # Initialize variables
 given_word=""
+# Output options
 json_queries=(
     '.[0].meanings[0].definitions[0].definition'
+    '.[0].meanings[0].definitions[0].synonyms[]'
     '.[0].meanings[0].partOfSpeech'
     '.[0].phonetic'
     )
@@ -17,14 +19,14 @@ json_queries_option=0
 Help(){
   echo "Check definition of given word"
   echo
-  echo "Usage: condict [-h|s|p|P]  [word ..]         get definition and an example of word"
+  echo "Syntax: condict [-h|d|s|p|P]  [word ..]         get definition of word"
   echo
   echo "Arguments:"
-  echo "  -s      list 5 synonyms"
+  echo "  -d      definition of word"
+  echo "  -s      list of synonyms"
   echo "  -p      part of speech"
   echo "  -P      phonetic"
   echo "  -h      show this help"
-  echo "  -V      show version"
   echo
   echo "DM me through discord if you've some other features in mind -> El Patron Salan#6684"
   echo
@@ -35,38 +37,47 @@ usage(){
   echo "Syntax: condict [-h|s|p|P]  [word ..]"
 }
 
-# Display definition of given word
+# Universal function for any dictionary query
 get_api(){
   curl --silent https://api.dictionaryapi.dev/api/v2/entries/en/$given_word | jq -r ${json_queries[$json_queries_option]}
 }
 
-
-# Get last argument which is word
-for i in $@; do :; done
+# Get last argument
+for i in "$@"; do true; done
 given_word=$i
 
-# and display definition
-echo "Definition:"
-get_api
-echo
-
 # Argument handler
-while getopts ':pPsh:' flag; do
+while getopts 'dsPph' flag; do
   case "${flag}" in
 
-    p)
+    d)
+      echo "Definition: $(get_api)"
+      ;;
+
+    s) 
+      echo
       json_queries_option=1
+      x=$(get_api)
+      if [[ ${x} = "" ]]; then
+        echo "Synonyms not found"
+
+      else
+        echo "Synonyms:"
+        get_api
+      fi
+      ;;
+
+    p)
+      echo
+      json_queries_option=2
       echo "Part of speech: $(get_api)"
       ;;
 
     P)
-      json_queries_option=2
+      echo
+      json_queries_option=3
       echo "Phonetic: $(get_api)"
       ;;  
-
-    s) 
-      
-      ;;
     
     h) 
       echo
@@ -75,13 +86,14 @@ while getopts ':pPsh:' flag; do
 
     \?)
       echo
-      Help
+      echo "Invalid option: use -h"
+      usage
       exit;;
 
     *) 
-      echo "Invalid option: use -h"
       echo
-      Usage
+      echo "Invalid option: use -h"
+      usage
       exit;;
   esac
 done
