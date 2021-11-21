@@ -3,6 +3,9 @@
 <p align="center">Script thanks to which you can <b>immediatly</b> check word definition, synonyms etc.</p>
 <h3></h3>
 
+#### Usage
+> To use this script you've to install **jq** beforehand
+
 #### Syntax
 ```
 ./condict.sh [-h|d|s|p|P]  [word ..]
